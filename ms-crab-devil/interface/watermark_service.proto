@@ -1,0 +1,17 @@
+syntax = "proto2";
+package modules.watermark_service.interface;
+
+service WatermarkService {
+  rpc WatermarkPdf (WatermarkPdfRequest) returns (WatermarkPdfResponse);
+}
+
+message WatermarkPdfRequest {
+  required string full_name= 1;
+  required string file_bucket = 2;
+  required string file_key = 3;
+}
+
+message WatermarkPdfResponse {
+  required string output_bucket = 1;
+  required string output_file_key = 2;
+}

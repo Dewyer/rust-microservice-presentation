@@ -1,0 +1,35 @@
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+dependencies = ["clean"]
+
+[tasks.make]
+dependencies = [
+    "format",
+    "build",
+]
+
+[tasks.cmake]
+dependencies = [
+    "clean",
+    "format",
+    "build",
+]
+
+[tasks.build_server]
+command = "cargo"
+args = ["build --bin crab_devil_server"]
+
+[tasks.run_server]
+command = "cargo"
+args = ["run --bin crab_devil_server"]
+dependencies=["build_server"]

@@ -1,0 +1,310 @@
+<!doctype html>
+<!--
+PRESENTATION
+ON
+THE
+RIGHT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -->
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Fast & Furious Microservices in Rust</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/night.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					<textarea data-template>
+						## Fast & Nice Microservices with interfaces, in Rust 🦀
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## What are we going to talk about?
+						- Rust
+						- Protobuf & GRPC
+
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## What I am not trying to say ...
+
+						To switch to Rust tomorrow
+
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## Important:
+
+						These are just my opinions, do with them as you wish.
+						Lets dive in.
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## What are we going to make:
+
+						The watermarking microservice with **GRPC** and some **Diesel**
+					</textarea>
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							## GRPC & Protobuf
+
+							- GR [What?](https://grpc.io/)
+							- Basically a function call over the internet
+							- You just have to specify how the remote service will look like:
+							```proto
+							service HelloService {
+								rpc SayHello (HelloRequest) returns (HelloReply);
+							}
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Protobuf
+
+							- Lets read even more [here](https://developers.google.com/protocol-buffers)
+							- So this is the IDL
+							```proto
+							message User {
+								required string name = 1;
+								required bool loves_rust = 2;
+								optional string email = 3;
+								optional fixed64 money = 4;
+								optional repeated string interests = 5;
+							}
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Oneof
+							```proto
+							message HelloRequest {
+								oneof greeting {
+									string human_greeting = 1 [default = "Hello!"];
+									uint64 computer_greeting = 2 [default = 1];
+								}
+							}
+							```
+
+							### Enums
+							```proto
+							enum Languages {
+								Php = 0;
+								Js = 1;
+								Rust = 2;
+							}
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Conclusions
+
+							- Small footprint
+							- Fast serialization
+							- Language agnostic
+							- Solves the runtime validation/type issue*
+						</textarea>
+					</section>
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							## Rust
+
+							- [This](https://www.rust-lang.org/)
+							- What does this all mean?
+								- No runtime ?
+								- Performance ?
+							- Its compiled, and optimized heavily
+							- Unique memory model, with ownership and lifetimes
+								- Every piece of data has a single owner
+								- Stuff can be borrowed, but there could be only 1 mutable borrow at a time
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Useful features of rust also include
+
+							- Immutability by default
+								- concept is baked into the language
+							```rust
+							let a = 10;
+							a += 1; // Error
+							let mut b = 10;
+							b += 1; // 😀
+							```
+							- Robust type system
+							```rust
+							(i32, u64, String, &str)
+							impl Trait, dyn Trait
+							Fn(i32) -> i32
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							- Zero cost abstractions
+								- Basically you can write code that is maintainable but also is still fast
+							- Macros (function like, derive / proc)
+							```rust
+							crud_repo!()
+							#[derive(serde::Serialize)]
+							```
+							- High quality tooling
+								- Language wide style guide with efficient formatter
+								- Documentation tooling
+								- Modern package manager
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							- Nice compiler error messages
+							![error_msg](images/compile_msg.jpg)
+							- Fearless concurrency
+								- [More about it here](https://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html)
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Disadvantages
+
+							- Speed
+								- End to End timings:
+									- __490ms__ with Rust
+									- __580__ existing
+								- Without S3 latency:
+									- __90ms__ w Rust
+									- __?__ existing
+									- Performance increase ?
+							- Writing the code is sometimes just slower *
+							- Clean re-builds can be slow
+							- **And more...**
+						</textarea>
+					</section>
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							## Lets get our hands dirty
+
+							> Talk is cheap, show me the code
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Watermarking service - Performance
+
+							- Gets around 130 calls a day, probably not super important
+							- Speed
+								- End to End timings:
+									- __490ms__ with Rust
+									- __580__ existing
+								- Without S3 latency:
+									- __90ms__ w Rust
+									- __?__ existing
+									- Performance increase ?
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Watermarking service - Honorable mentions
+
+							- We are logging watermark creations
+								- What is up with Diesel?
+							- Uses at max 100MB of memory / microservice
+						</textarea>
+					</section>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## Conclusion
+					</textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				slideNumber: true,
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>

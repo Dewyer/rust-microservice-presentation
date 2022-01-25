@@ -1,0 +1,52 @@
+[package]
+name = "ms-crab-devil"
+version = "0.1.0"
+edition = "2021"
+
+[build-dependencies]
+tonic-build = "0.6"
+
+[profile.release]
+opt-level = 3
+
+[dependencies]
+log = "0.4.0"
+env_logger = "0.9.0"
+diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuid", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+diesel_migrations = "1.4.0"
+lazy_static = "1.4.0"
+r2d2 = "0.8.9"
+
+thiserror = "1.0.30"
+futures-util = "0.3.19"
+uuid = { version = "0.6", features = ["serde", "v4"] }
+
+dotenv = "0.15.0"
+
+async-trait = "0.1.52"
+
+tonic = "0.6"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+prost = "0.9"
+
+# watermark stuff
+lopdf = "0.27.0"
+
+rusoto_core = "0.47.0"
+rusoto_s3 = "0.47.0"
+
+koval = { path="../koval" }
+
+[lib]
+name = "crab_devil"
+path = "src/lib.rs"
+
+[[bin]]
+name = "crab_devil_server"
+path = "src/server.rs"
+
+[[bin]]
+name = "crab_devil_client"
+path = "src/client.rs"
+
